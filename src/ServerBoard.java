@@ -1,9 +1,11 @@
 import javax.swing.*;
+
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
 import java.io.IOException;
- 
+import java.io.*;
 public class ServerBoard extends JFrame {
     private JTextArea messagesArea;
     private JButton sendButton;
@@ -55,20 +57,54 @@ public class ServerBoard extends JFrame {
                 startServer.setEnabled(false);
  
                 //creates the object OnMessageReceived asked by the TCPServer constructor
-                mServer = new TCPServer(new TCPServer.OnMessageReceived() {
+                mServer = new TCPServer(new OnMessageReceived() {
                     @Override
                     //this method declared in the interface from TCPServer class is implemented here
                     //this method is actually a callback method, because it will run every time when it will be called from
                     //TCPServer class (at while)
                     public void messageReceived(String message) {
+                    	if(message.startsWith("request")){
+                    		try {
+								mServer.sendMessage("reply " + mServer.adreseIP.get(message.substring(8)) + " " + mServer.ports.get(message.substring(8)));
+							} catch (IOException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							}
+                    	}
+                    	if(message.startsWith("init")){
+                    		mServer.adreseIP.put(message.substring(message.lastIndexOf(" ") + 1), message.substring(message.indexOf(" ") + 1,message.indexOf(" ", 5)));
+                    		mServer.ports.put(message.substring(message.lastIndexOf(" ") + 1), Integer.parseInt(message.substring(message.indexOf(" ", 5) + 1,message.lastIndexOf(" "))));
+                    		
+                    		System.out.println(message.substring(message.lastIndexOf(" ") + 1));
+                    		System.out.println( message.substring(message.indexOf(" ") + 1,message.indexOf(" ", 5)));
+                    		System.out.println( Integer.parseInt(message.substring(message.indexOf(" ", 5) + 1,message.lastIndexOf(" "))));
+                    		
+                    		try {
+								mServer.sendMessage(mServer.adreseIP.get(message.substring(message.lastIndexOf(" ") + 1)) + " " + mServer.ports.get(message.substring(message.lastIndexOf(" ") + 1)));
+							} catch (IOException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							}
+                    	}
+                    	
                     	if (message.startsWith("getpictures")) {
                     		try {
                     			// append n pictures
 								mServer.sendMessage("GET_PICTURES" + TCPServer.PicturesNumber);
 								
 								// for loop
-								for(int i = 0; i < TCPServer.PicturesNumber; i++)
-									mServer.sendMessage("sendfile " + "image0" + (i+1) + ".png");
+								for(int i = 0; i < TCPServer.PicturesNumber; i++){
+									if(i >= 9){
+										File myFile = new File ("image" + (i+1) + ".png");
+										byte [] mybytearray  = new byte [(int)myFile.length()];
+										mServer.sendMessage("sendimage " + "image" + (i+1) + ".png" + mybytearray.length);
+									}
+									else{
+										File myFile = new File ("image0" + (i+1) + ".png");
+										byte [] mybytearray  = new byte [(int)myFile.length()];
+										mServer.sendMessage("sendimage " + "image0" + (i+1) + ".png" + mybytearray.length);
+									}
+								}
 							} catch (IOException e) {
 								e.printStackTrace();
 							}
