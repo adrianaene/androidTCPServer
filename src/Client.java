@@ -1,7 +1,7 @@
 import java.net.Socket;
 
-
 public class Client {
+	
 	private String name;
 	private Socket socket;
 	
