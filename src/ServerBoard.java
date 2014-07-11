@@ -61,8 +61,8 @@ public class ServerBoard extends JFrame {
                     //this method is actually a callback method, because it will run every time when it will be called from
                     //TCPServer class (at while)
                     public void messageReceived(String message) {
-                    	System.out.println("in Message Received: " + message);
-                    		messagesArea.append("\n "+message);
+                    	System.out.println("In Message Received: " + message);
+                    	messagesArea.append("\n "+message);
                     }
                 });
                 mServer.start();

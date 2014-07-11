@@ -125,7 +125,6 @@ public class ClientHandler implements Runnable {
 						}
 					}
 				} else if (message != null && messageListener != null) {
-					System.out.println("ceva" + message);
 					// call the method messageReceived from ServerBoard class
 					messageListener.messageReceived(name + ": " + message);
 				}
